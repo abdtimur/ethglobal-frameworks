@@ -1,3 +1,4 @@
+export const MEETFRAMES_ADDRESS = "0x722F7a61d1a58d22bcEA95184a4FAadEe955F689";
 export const MeetFramesAbi = [
   {
     inputs: [],
@@ -79,11 +80,6 @@ export const MeetFramesAbi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
-      },
-      {
         internalType: "string",
         name: "frameId",
         type: "string",
@@ -98,13 +94,28 @@ export const MeetFramesAbi = [
     inputs: [
       {
         internalType: "string",
-        name: "frameId",
+        name: "newFrameId",
         type: "string",
       },
       {
         internalType: "address",
         name: "mentor",
         type: "address",
+      },
+      {
+        internalType: "string",
+        name: "mentorName",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "mentorProfile",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "sessionTitle",
+        type: "string",
       },
       {
         internalType: "uint256",
@@ -130,6 +141,57 @@ export const MeetFramesAbi = [
     name: "createFrame",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "mentor",
+        type: "address",
+      },
+    ],
+    name: "getActiveFrames",
+    outputs: [
+      {
+        internalType: "string[4]",
+        name: "",
+        type: "string[4]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "mentor",
+        type: "address",
+      },
+    ],
+    name: "getActiveFramesCount",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getCurrentFrameId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -176,11 +238,6 @@ export const MeetFramesAbi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
-      },
-      {
         internalType: "string",
         name: "frameId",
         type: "string",
@@ -200,11 +257,6 @@ export const MeetFramesAbi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
-      },
-      {
         internalType: "string",
         name: "frameId",
         type: "string",
@@ -218,6 +270,21 @@ export const MeetFramesAbi = [
             internalType: "address",
             name: "mentor",
             type: "address",
+          },
+          {
+            internalType: "string",
+            name: "mentorName",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "mentorProfile",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "sessionTitle",
+            type: "string",
           },
           {
             internalType: "uint256",
@@ -259,6 +326,11 @@ export const MeetFramesAbi = [
             name: "completed",
             type: "bool",
           },
+          {
+            internalType: "bool",
+            name: "activated",
+            type: "bool",
+          },
         ],
         internalType: "struct MeetFrames.FrameConfig",
         name: "",
@@ -295,11 +367,6 @@ export const MeetFramesAbi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
-      },
-      {
         internalType: "string",
         name: "frameId",
         type: "string",
@@ -318,11 +385,6 @@ export const MeetFramesAbi = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
-      },
       {
         internalType: "string",
         name: "frameId",
@@ -369,19 +431,6 @@ export const MeetFramesAbi = [
       },
     ],
     name: "transferOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "frameId",
-        type: "string",
-      },
-    ],
-    name: "withdrawBid",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

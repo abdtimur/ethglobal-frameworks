@@ -10,8 +10,8 @@ import {
   http,
   parseEther,
 } from "viem";
-import { baseSepolia, optimism } from "viem/chains";
-import { MeetFramesAbi } from "./abi";
+import { baseSepolia } from "viem/chains";
+import { MEETFRAMES_ADDRESS, MeetFramesAbi } from "../txdata/abi";
 
 export async function POST(
   req: NextRequest
@@ -20,17 +20,10 @@ export async function POST(
 
   const frameMessage = await getFrameMessage(json);
   console.log("Frame message", frameMessage);
-  const frameId = JSON.parse(frameMessage?.state || "{}").frameId;
+  const state = JSON.parse(frameMessage?.state || "{}") as any;
 
-  if (!frameMessage || !frameId) {
-    throw new Error("No frame message or frame ID found");
-  }
-
-  // Get current storage price
-  const bid = BigInt(parseEther(frameMessage.inputText || "0"));
-  if (bid <= 0) {
-    // TODO: Check on minimal bid as well
-    throw new Error("Invalid bid amount");
+  if (!frameMessage) {
+    throw new Error("No frame message found");
   }
 
   const publicClient = createPublicClient({
@@ -42,22 +35,31 @@ export async function POST(
     abi: MeetFramesAbi,
     client: publicClient,
   });
-  const currentWinnerBid = (await meetFramesRegistry.read.getFrameWinnerBid([
-    getAddress("0x3C9Fd1778463066a8614B2B2F7CfBdf5491F4875"),
-    frameId,
-  ])) as bigint;
-  console.log("Current winner bid", currentWinnerBid);
-  if (bid <= currentWinnerBid) {
-    throw new Error("Bid must be higher than the current winner");
-  }
+
+  const currentFrameId = await meetFramesRegistry.read.getCurrentFrameId();
+  const newFrameId = `frame-${currentFrameId}`;
 
   const txAddress =
     frameMessage.connectedAddress || frameMessage.requesterVerifiedAddresses[0];
 
+  console.log("State is ", state);
+  console.log("Frame ID is ", newFrameId);
+  console.log("txAddress is ", txAddress);
+
   const calldata = encodeFunctionData({
     abi: MeetFramesAbi,
-    functionName: "bidFrame",
-    args: [getAddress("0x3C9Fd1778463066a8614B2B2F7CfBdf5491F4875"), frameId],
+    functionName: "createFrame",
+    args: [
+      newFrameId,
+      txAddress,
+      state.mentorName,
+      state.mentorProfile,
+      state.sessionTitle,
+      BigInt(state.fid),
+      BigInt(state.closingTime),
+      BigInt(state.targetTime),
+      BigInt(state.minBid),
+    ],
   });
 
   return NextResponse.json({
@@ -67,7 +69,7 @@ export async function POST(
       abi: MeetFramesAbi as Abi,
       to: MEETFRAMES_ADDRESS,
       data: calldata,
-      value: bid.toString(),
+      value: "0",
     },
   });
 }

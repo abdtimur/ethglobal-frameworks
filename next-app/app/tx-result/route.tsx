@@ -18,7 +18,7 @@ const handleRequest = frames(async (ctx) => {
         </Button>,
         <Button
           action="link"
-          target={`https://www.onceupon.gg/tx/${ctx.message.transactionId}`}
+          target={`https://sepolia.basescan.org/tx/${ctx.message.transactionId}`}
         >
           View on block explorer
         </Button>,

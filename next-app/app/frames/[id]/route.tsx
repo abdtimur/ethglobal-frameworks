@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-key */
 import { createFrames, Button } from "frames.js/next";
+import { getProperTimeLeftString } from "../../utils";
 
 interface ServerResponse {
   hasFrame: boolean;
@@ -22,7 +23,7 @@ export const mockServerCall = async (frameId: string, requesterFid: string) => {
       const serverResponse = {
         hasFrame: true,
         frameData: {
-          id: "my-frame-id",
+          id: "my-frame-1",
           targetNickname: "lolchto",
           targetProfile: "https://warpcast.com/lolchto",
           timestamp: "2024-04-07T00:00:00.000Z",
@@ -44,11 +45,11 @@ const handleRequest = frames(async (ctx) => {
   const pathParams = ctx?.url?.pathname.split("/").filter(Boolean);
   const frameId = pathParams[1]; // e.g. /frames/12345 -> 12345
 
-  if(!frameId) {
+  if (!frameId) {
     return {
       image: <span>Missing target frame ID</span>,
       buttons: [
-        <Button action="post" target={{ pathname: "/mentors" }}>
+        <Button action="post" target={{ pathname: "/meetframes" }}>
           Return to the main page
         </Button>,
       ],
@@ -58,15 +59,9 @@ const handleRequest = frames(async (ctx) => {
   const requesterFid = ctx?.message?.requestedFid || null;
   const serverData = await mockServerCall(frameId, requesterFid);
 
-  const hoursLeft = Math.floor(
-    (new Date(serverData.frameData.deadline).getTime() - new Date().getTime()) /
-      (1000 * 60 * 60)
-  ); // hours left to bid
-  const minsLeft = Math.floor(
-    (new Date(serverData.frameData.deadline).getTime() - new Date().getTime()) /
-      (1000 * 60)
-  ); // mins left to bid if less than 1 hour left
-  const timeLeft = hoursLeft > 0 ? `${hoursLeft} hours` : `${minsLeft} mins`;
+  const timeLeft = getProperTimeLeftString(
+    new Date(serverData.frameData.deadline).getTime() - new Date().getTime()
+  );
 
   const actionButton = (
     <Button

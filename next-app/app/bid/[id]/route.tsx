@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key */
 import { createFrames, Button } from "frames.js/next";
-import { mockServerCall } from "../../mentors/[id]/route";
+import { mockServerCall } from "../../frames/[id]/route";
 import { getFrameMessage } from "frames.js";
 
 const frames = createFrames({});

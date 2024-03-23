@@ -15,8 +15,15 @@ describe("Golden Path Tests", function () {
       await MeetFrames.connect(owner).deploy()
     ).waitForDeployment();
 
+    const currentFrameId = await meetFramesContract.getCurrentFrameId();
+
+    expect(currentFrameId).to.equal(0);
+
     const testFrame1 = {
-      frameId: "testFrame1",
+      frameId: `frame-${currentFrameId}`,
+      mentorName: "lolchto",
+      mentorProfile: "https://warpcast.com/lolchto",
+      sessionTitle: "Offline coffee break with Tim",
       fid: 1,
       closingTime: new Date().getTime() + 1000 * 60 * 1, // 1 minute from now
       targetTime: new Date().getTime() + 1000 * 60 * 2, // 2 minutes from now
@@ -28,28 +35,53 @@ describe("Golden Path Tests", function () {
       .createFrame(
         testFrame1.frameId,
         mentor.address,
+        testFrame1.mentorName,
+        testFrame1.mentorProfile,
+        testFrame1.sessionTitle,
         testFrame1.fid,
         testFrame1.closingTime,
         testFrame1.targetTime,
         testFrame1.minBid
       );
 
-    return { meetFramesContract, testFrame1, owner, mentor, buyer, buyer2 };
+    const activeCount = await meetFramesContract.getActiveFramesCount(
+      mentor.address
+    );
+    console.log(activeCount);
+
+    const activeFrames = await meetFramesContract.getActiveFrames(
+      mentor.address
+    );
+    console.log(activeFrames.length);
+
+    const frameId1 = activeFrames[0];
+    console.log(`Frame ID: ${frameId1}`);
+
+    return {
+      meetFramesContract,
+      testFrame1,
+      owner,
+      mentor,
+      buyer,
+      buyer2,
+      frameId1,
+    };
   }
 
   describe("MeetFrames", function () {
     it("Should create a frame", async function () {
-      const { meetFramesContract, testFrame1, mentor } = await loadFixture(
-        deployMeetFrames
-      );
+      const { meetFramesContract, testFrame1, mentor, frameId1 } =
+        await loadFixture(deployMeetFrames);
 
-      const frame = await meetFramesContract.getFrameConfig(
-        mentor.address,
-        testFrame1.frameId
-      );
+      const frame = await meetFramesContract.getFrameConfig(testFrame1.frameId);
+      expect(frameId1).to.equal(testFrame1.frameId);
+      expect(frame.mentor).to.equal(mentor.address);
       expect(frame.fid).to.equal(testFrame1.fid);
       expect(frame.closingTime).to.equal(testFrame1.closingTime);
       expect(frame.targetTime).to.equal(testFrame1.targetTime);
+      expect(frame.mentorName).to.equal(testFrame1.mentorName);
+      expect(frame.mentorProfile).to.equal(testFrame1.mentorProfile);
+      expect(frame.sessionTitle).to.equal(testFrame1.sessionTitle);
       expect(frame.minBid).to.equal(testFrame1.minBid);
     });
 
@@ -130,10 +162,7 @@ describe("Golden Path Tests", function () {
         Number(ethers.formatEther(mentorBalanceAfter)).toFixed(2)
       ).to.be.equal(Number(ethers.formatEther(mentorBalanceBefore)).toFixed(2));
 
-      const frame = await meetFramesContract.getFrameConfig(
-        mentor.address,
-        testFrame1.frameId
-      );
+      const frame = await meetFramesContract.getFrameConfig(testFrame1.frameId);
       expect(frame.completed).to.equal(true);
     });
 
@@ -167,10 +196,7 @@ describe("Golden Path Tests", function () {
         ).toFixed(3)
       ).to.be.equal("0.002");
 
-      const frame = await meetFramesContract.getFrameConfig(
-        mentor.address,
-        testFrame1.frameId
-      );
+      const frame = await meetFramesContract.getFrameConfig(testFrame1.frameId);
       expect(frame.completed).to.equal(true);
     });
 
@@ -213,7 +239,6 @@ describe("Golden Path Tests", function () {
       expect(frameBid.bid).to.equal(ethers.parseEther("0.003"));
 
       const frameConfig = await meetFramesContract.getFrameConfig(
-        mentor.address,
         testFrame1.frameId
       );
       expect(frameConfig.winner).to.equal(buyer2.address);

@@ -14,23 +14,23 @@ const config: HardhatUserConfig = {
     baseSepolia: {
       url: process.env.BASE_SEPOLIA_RPC_URL,
       accounts: [process.env.KEY_TESTIK!],
-    }
+    },
   },
   etherscan: {
     apiKey: {
       baseSepolia: process.env.ETHERSCAN_API_KEY!,
-    }, 
+    },
     customChains: [
       {
         network: "baseSepolia",
         chainId: 84532,
         urls: {
           apiURL: "https://api-sepolia.basescan.org/apii",
-          browserURL: "https://sepolia.basescan.org"
-        }
-      }
-    ]
-  }
+          browserURL: "https://sepolia.basescan.org",
+        },
+      },
+    ],
+  },
 };
 
 export default config;

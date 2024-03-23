@@ -3,7 +3,7 @@ import { ethers, run } from "hardhat";
 async function verify() {
   const contract = await ethers.getContractAt(
     "MeetFrames",
-    "0xa9c715e2b231b5f2E3dA5463240F1f9C1E549c38"
+    "0x722F7a61d1a58d22bcEA95184a4FAadEe955F689"
   );
 
   await run("verify:verify", {
