@@ -1,7 +1,10 @@
 /* eslint-disable react/jsx-key */
 import { createFrames, Button } from "frames.js/next";
 
-const frames = createFrames();
+const frames = createFrames({
+  basePath: "/mentors",
+});
+
 const handleRequest = frames(async (ctx) => {
   console.log(ctx);
 
@@ -21,7 +24,10 @@ const handleRequest = frames(async (ctx) => {
     image: <span>{`Want to book a slot for ${date}?\ `}</span>,
     textInput: `Your Bid Here. Min bid is ${minBid}`,
     buttons: [
-      <Button action="post" target={{ query: { value: minBid }, pathname: "/bid" }}>
+      <Button
+        action="post"
+        target={{ query: { value: minBid }, pathname: "/bid" }}
+      >
         Bid To Book - Tx Here
       </Button>,
       <Button

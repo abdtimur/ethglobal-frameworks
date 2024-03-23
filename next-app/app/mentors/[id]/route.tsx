@@ -16,7 +16,7 @@ interface ServerResponse {
   };
 }
 
-const mockServerCall = async (requesterFid: string) => {
+export const mockServerCall = async (frameId: string, requesterFid: string) => {
   return new Promise<ServerResponse>((resolve) => {
     setTimeout(() => {
       const serverResponse = {
@@ -40,8 +40,23 @@ const mockServerCall = async (requesterFid: string) => {
 
 const frames = createFrames();
 const handleRequest = frames(async (ctx) => {
+  console.log(ctx.url);
+  const pathParams = ctx?.url?.pathname.split("/").filter(Boolean);
+  const frameId = pathParams[1]; // e.g. /frames/12345 -> 12345
+
+  if(!frameId) {
+    return {
+      image: <span>Missing target frame ID</span>,
+      buttons: [
+        <Button action="post" target={{ pathname: "/mentors" }}>
+          Return to the main page
+        </Button>,
+      ],
+    };
+  }
+
   const requesterFid = ctx?.message?.requestedFid || null;
-  const serverData = await mockServerCall(requesterFid);
+  const serverData = await mockServerCall(frameId, requesterFid);
 
   const hoursLeft = Math.floor(
     (new Date(serverData.frameData.deadline).getTime() - new Date().getTime()) /
@@ -62,14 +77,16 @@ const handleRequest = frames(async (ctx) => {
           totalBids: serverData.frameData.totalBids,
           yourBid: serverData.frameData.yourBid,
         },
-        pathname: "/bid",
+        pathname: `/bid/${serverData.frameData.id}`,
       }}
     >
       {serverData.frameData.yourBid ? "Top up" : "Bid To Book"}
     </Button>
   );
   const needWithdrawButton = !!serverData.frameData.yourBid; // TODO: add withdraw logic
-  const pretiffiedDate = new Date(serverData.frameData.timestamp).toLocaleDateString();
+  const pretiffiedDate = new Date(
+    serverData.frameData.timestamp
+  ).toLocaleDateString();
 
   return {
     // Want to book a session with @lolchto?
@@ -78,7 +95,7 @@ const handleRequest = frames(async (ctx) => {
     // Session date: 2024-04-07
     // Time to make your offer: 5 hours
     image: (
-      <div tw="flex flex-col justify-items-center bg-white">
+      <div tw="flex flex-col justify-items-center  bg-white">
         <h1 tw="text-lg font-bold text-indigo-600 mb-2">
           Want to book a session with @{serverData.frameData.targetNickname}?
         </h1>
@@ -86,15 +103,11 @@ const handleRequest = frames(async (ctx) => {
           Make your offer before the deadline!
         </p>
         <div tw="border-t border-gray-200 pt-4 flex flex-col">
-          <h2 tw="text-md font-semibold text-gray-900">
+          <h2 tw="text-sm font-semibold text-gray-900">
             Session name:{" "}
-            <span tw="font-normal">
-              {serverData.frameData.sessionName}
-            </span>
+            <span tw="font-normal">{serverData.frameData.sessionName}</span>
           </h2>
-          <p tw="text-sm text-gray-600">
-            Session date: {pretiffiedDate}
-          </p>
+          <p tw="text-sm text-gray-600">Session date: {pretiffiedDate}</p>
           <p tw="text-sm font-semibold text-indigo-500">
             Time to make your offer: {timeLeft}
           </p>
@@ -109,7 +122,10 @@ const handleRequest = frames(async (ctx) => {
       needWithdrawButton && (
         <Button
           action="post"
-          target={{ query: { value: "No" }, pathname: "/frames" }}
+          target={{
+            query: { value: "No" },
+            pathname: `/bid/${serverData.frameData.id}`,
+          }}
         >
           Withdraw Bid
         </Button>
@@ -121,6 +137,9 @@ const handleRequest = frames(async (ctx) => {
     headers: {
       // Max cache age in seconds
       "Cache-Control": "max-age=0",
+    },
+    state: {
+      frameId: serverData.frameData.id,
     },
   };
 });
