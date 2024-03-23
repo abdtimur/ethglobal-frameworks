@@ -1,0 +1,19 @@
+{
+  "name": "ethglobal-frameworks-chain",
+  "version": "1.0.0",
+  "description": "contracts",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.5",
+    "hardhat": "^2.19.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "@lolchto",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "dotenv": "^16.3.1"
+  }
+}

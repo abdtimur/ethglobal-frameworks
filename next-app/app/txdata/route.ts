@@ -10,10 +10,9 @@ import {
   parseEther,
 } from "viem";
 import { optimism } from "viem/chains";
+import { MeetFramesAbi } from "./abi";
 
-const MEETFRAMES_ADDRESS = "0x1234567890123456789012345678901234567890";
-
-const meetFramesAbi = {};
+const MEETFRAMES_ADDRESS = "0xa9c715e2b231b5f2E3dA5463240F1f9C1E549c38";
 
 export async function POST(
   req: NextRequest
@@ -21,21 +20,24 @@ export async function POST(
   const json = await req.json();
 
   const frameMessage = await getFrameMessage(json);
+  const frameId = frameMessage?.state?.frameId;
 
-  if (!frameMessage) {
-    throw new Error("No frame message");
+  if (!frameMessage || !frameId) {
+    throw new Error("No frame message or frame ID found");
   }
 
   // Get current storage price
-  const units = BigInt(parseEther(frameMessage.inputText || '0'));
-  if(units <= 0) {
+  const units = BigInt(parseEther(frameMessage.inputText || "0"));
+  if (units <= 0) {
     throw new Error("Invalid bid amount");
   }
 
+  const txAddress =
+    frameMessage.connectedAddress || frameMessage.requesterVerifiedAddresses[0];
   const calldata = encodeFunctionData({
-    abi: meetFramesAbi as Abi,
-    functionName: "bid",
-    args: [BigInt(frameMessage.requesterFid), units],
+    abi: MeetFramesAbi,
+    functionName: "bidFrame",
+    args: [txAddress, frameId],
   });
 
   const publicClient = createPublicClient({
@@ -45,7 +47,7 @@ export async function POST(
 
   const storageRegistry = getContract({
     address: MEETFRAMES_ADDRESS,
-    abi: meetFramesAbi as Abi,
+    abi: MeetFramesAbi,
     client: publicClient,
   });
 
@@ -55,7 +57,7 @@ export async function POST(
     chainId: "eip155:84532", // Base Sepolia chain
     method: "eth_sendTransaction",
     params: {
-      abi: meetFramesAbi as Abi,
+      abi: MeetFramesAbi as Abi,
       to: MEETFRAMES_ADDRESS,
       data: calldata,
       value: unitPrice.toString(),
