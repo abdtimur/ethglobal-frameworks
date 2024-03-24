@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key */
 import { createFrames, Button } from "frames.js/next";
-import { getProperTimeLeftString } from "../../utils";
+import { currentURL, getProperTimeLeftString } from "../../utils";
 import { FrameConfig, getFrameBidFor, getFrameConfig } from "../../chain";
 import { formatEther } from "viem";
 
@@ -34,6 +34,22 @@ const handleRequest = frames(async (ctx) => {
     new Date(Number(config.closingTime)).getTime() - new Date().getTime()
   );
 
+  let isOwner = false;
+  const requesterFid = ctx?.message?.requesterFid || null;
+  if (requesterFid) {
+    isOwner = config.fid.toString() === requesterFid + "";
+  }
+
+  const secondButton = isOwner ? (
+    <Button action="link" target={`${currentURL(`frames/${frameId}`)}`}>
+      Copy Link
+    </Button>
+  ) : (
+    <Button action="post" target={{ pathname: `/meetframes` }}>
+      Want the same tool?
+    </Button>
+  );
+
   return {
     image: (
       <div tw="relative flex min-w-screen min-h-screen flex-col justify-center overflow-hidden bg-gray-50 p-12">
@@ -61,9 +77,7 @@ const handleRequest = frames(async (ctx) => {
       <Button action="post" target={{ pathname: `/details/${frameId}` }}>
         More info
       </Button>,
-      <Button action="post" target={{ pathname: `/meetframes` }}>
-        Want the same tool?
-      </Button>,
+      secondButton,
     ],
     headers: {
       "Cache-Control": "max-age=0",
