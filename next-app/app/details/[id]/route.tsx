@@ -134,7 +134,7 @@ const prepareMentorView = (
             : `https://warpcast.com/${config.winner.toString()}`
         }
       >
-        Current Winner Profile
+        Current Leading Bidder
       </Button>
     );
   }
@@ -180,7 +180,7 @@ const prepareMentorView = (
           {!config.completed && config.winner > 0n && (
             <div tw="flex text-2xl text-start font-black mb-4">
               You can close the bids ahead of time if you want and like the
-              current winner 🤪
+              current top contributor 🤪
             </div>
           )}
         </div>
@@ -271,12 +271,12 @@ const prepareJustView = (
           </div>
           {!isWinner && (
             <div tw="flex text-2xl text-start font-black mb-4">
-              Winner is: {config.winner.toString()}
+              Top Contributor is: {config.winner.toString()}
             </div>
           )}
           {isWinner && config.completed && (
             <div tw="flex text-2xl text-start font-black mb-4">
-              You are the winner! 🎉
+              You are the Top Contributor! 🎉
             </div>
           )}
           {isWinner && !config.completed && (
