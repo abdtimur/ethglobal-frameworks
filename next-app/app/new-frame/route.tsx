@@ -122,6 +122,7 @@ const handle1stage = async (ctx) => {
         <p tw="text-4xl py-0 text-start">
           {`Please share the time of your event below (Timezone: UTC):`}
         </p>
+        <span tw="text-3xl py-0 text-start">{`Example: 2024-06-31 23:30`}</span>
       </div>
     ),
     textInput: "Event Time",
@@ -173,8 +174,9 @@ const handle2stage = async (ctx) => {
           3/4 What will be your event deadline for sales?
         </h1>
         <p tw="text-4xl py-0 text-start">
-          {`Please share the deadline for sales below (Timezone: UTC):`}
+          {`Please share the deadline for sales below (Timezone UTC)`}
         </p>
+        <span tw="text-3xl py-0 text-start">{`Example: 2024-06-31 23:30`}</span>
       </div>
     ),
     textInput: "Sales Deadline",
@@ -231,6 +233,7 @@ const handle3stage = async (ctx) => {
         <p tw="text-4xl py-0 text-start">
           {`Please share the minimum bid ETH amount below:`}
         </p>
+        <span tw="text-3xl py-0 text-start">{`Example: 0.001`}</span>
       </div>
     ),
     textInput: "Minimum Bid Amount",

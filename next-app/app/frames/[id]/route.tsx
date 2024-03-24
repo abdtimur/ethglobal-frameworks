@@ -57,7 +57,7 @@ const handleRequest = frames(async (ctx) => {
 
         <div tw="flex flex-col justify-center text-3xl py-0 text-start">
           <div tw="flex text-2xl text-start font-black mb-4">
-            When: {new Date(Number(config.targetTime)).toLocaleDateString()}
+            When: {new Date(Number(config.targetTime)).toUTCString()}
           </div>
           <div tw="flex text-2xl text-start font-black mb-4">
             Current event status: {config.completed ? "Completed" : "Active"}
