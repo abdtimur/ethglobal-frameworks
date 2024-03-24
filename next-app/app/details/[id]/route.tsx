@@ -3,6 +3,12 @@ import { createFrames, Button } from "frames.js/next";
 import { getProperTimeLeftString } from "../../utils";
 import { FrameConfig, getFrameBidFor, getFrameConfig } from "../../chain";
 import { formatEther } from "viem";
+import {
+  PinataFcUser,
+  getFcUser,
+  readPinataInteractions,
+  sendPinataEvent,
+} from "../../pinata-events";
 
 const loadChainData = async (frameId: string, requesterFid: number) => {
   const config = await getFrameConfig(frameId);
@@ -52,19 +58,26 @@ const handleRequest = frames(async (ctx) => {
     new Date(Number(config.closingTime)).getTime() - new Date().getTime()
   );
 
-  const linkButton = isRequesterMentor ? (
-    // TODO: add winner profile link
-    <Button action="link" target={config.mentorProfile}>
-      Current Winner Profile
-    </Button>
-  ) : (
+  const linkButton = (
     <Button action="link" target={config.mentorProfile}>
       Verify Profile
     </Button>
   );
 
+  // TODO: Test in the morning
+  // const getInteractions = await readPinataInteractions(
+  //   frameId,
+  //   `${frameId}/details`
+  // );
+  // const messageBody = await ctx.request.json();
+  // console.log(messageBody);
+  // sendPinataEvent(frameId, `${frameId}/details`, messageBody);
+
+  const winnerFcUser =
+    config.winner > 0n ? await getFcUser(config.winner.toString()) : null;
+
   if (isRequesterMentor) {
-    return prepareMentorView(frameId, linkButton, config);
+    return prepareMentorView(frameId, config, winnerFcUser);
   }
   return requesterCanBid
     ? prepareBidderView(frameId, linkButton, config, timeLeft)
@@ -73,8 +86,8 @@ const handleRequest = frames(async (ctx) => {
 
 const prepareMentorView = (
   frameId: string,
-  linkButton: JSX.Element,
-  config: FrameConfig
+  config: FrameConfig,
+  winnerFcUser: PinataFcUser | null
 ) => {
   const buttons = [
     <Button action="post" target={{ pathname: "/frames" }}>
@@ -88,9 +101,22 @@ const prepareMentorView = (
       </Button>
     );
   }
+
   if (config.winner > 0n) {
-    buttons.push(linkButton);
+    buttons.push(
+      <Button
+        action="link"
+        target={
+          winnerFcUser
+            ? `https://warpcast.com/${winnerFcUser.username}`
+            : `https://warpcast.com/${config.winner.toString()}`
+        }
+      >
+        Current Winner Profile
+      </Button>
+    );
   }
+
   return {
     image: (
       <div tw="relative flex min-w-screen min-h-screen flex-col justify-center overflow-hidden bg-gray-50 p-12">
@@ -107,8 +133,11 @@ const prepareMentorView = (
           </div>
           {config.winner > 0n && (
             <div tw="flex text-2xl text-start font-black mb-4">
-              Current bid: {config.winner.toString()} with{" "}
-              {formatEther(BigInt(config.winnerBid))} ETH
+              Current bid:{" "}
+              {`@${
+                winnerFcUser ? winnerFcUser.username : config.winner.toString()
+              }`}{" "}
+              with {formatEther(BigInt(config.winnerBid))} ETH
             </div>
           )}
           {config.winner === 0n && (
