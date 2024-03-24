@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { getFrameMessage } from "frames.js";
 import { createFrames, Button } from "frames.js/next";
+import { getActiveFrames } from "../chain";
 
 const frames = createFrames({
   initialState: {
@@ -10,8 +11,6 @@ const frames = createFrames({
 });
 
 const handleRequest = frames(async (ctx) => {
-  const requesterFid = ctx?.message?.requestedFid || null;
-
   try {
     const body = await ctx.request.json();
     console.log(body);
@@ -20,14 +19,17 @@ const handleRequest = frames(async (ctx) => {
 
     const username = frameMessage.requesterUserData?.username || null;
 
-    const requesterAddress =
-      frameMessage.connectedAddress ||
-      frameMessage.requesterVerifiedAddresses[0];
+    const requesterFid = frameMessage.requesterFid || null;
+
+    if (!frameMessage || !requesterFid) {
+      throw new Error("No frame message or frame ID found");
+    }
 
     // here should be contract request to get active frames
-    const activeFrames = 0;
+    const activeFrames = await getActiveFrames(requesterFid);
+    console.log(activeFrames);
 
-    return prepareFrameBody(username, activeFrames, ["1", "2", "3", "4"]);
+    return prepareFrameBody(username, activeFrames.length, activeFrames);
   } catch (e) {
     console.error(e);
     return {
@@ -51,8 +53,7 @@ const prepareFrameBody = (
     // Max cache age in seconds
     "Cache-Control": "max-age=0",
   };
-  const headerText = `Let me see
-    ${username ? `, @${username}...` : "..."}`;
+  const headerText = `Let me see${username ? `, @${username}...` : "..."}`;
   const buttons = frameIds.map((id) => (
     <Button action="post" target={{ pathname: `/frames/${id}` }}>
       {id}
@@ -62,16 +63,16 @@ const prepareFrameBody = (
     case activeFrames > 3:
       return {
         image: (
-          <div tw="flex flex-col justify-items-center bg-white">
-            <h1 tw="text-xs font-bold text-center">{headerText}</h1>
-            <p tw="text-xs text-center">
+          <div tw="relative flex min-w-screen min-h-screen flex-col justify-center overflow-hidden bg-gray-50 p-12">
+            <h1 tw="text-6xl font-bold text-start mr-10">{headerText}</h1>
+            <p tw="text-4xl py-0 text-start">
               Wow, you have a lot of active MeetFrames!
             </p>
-            <p tw="text-xs text-center">
+            <p tw="text-4xl py-0 text-start">
               You will need to complete or cancel some of them before creating a
               new one. Since I can only show 4 at a time.
             </p>
-            <p tw="text-xs text-center">
+            <p tw="text-4xl py-0 text-start">
               Use the buttons below to select your frames
             </p>
           </div>
@@ -85,16 +86,15 @@ const prepareFrameBody = (
     case activeFrames > 0 && activeFrames < 4:
       return {
         image: (
-          <div tw="flex flex-col justify-items-center bg-white">
-            <h1 tw="text-xs font-bold text-center">{headerText}</h1>
-            <p tw="text-xs text-center">
-              Wow, you already have some active MeetFrames!
+          <div tw="relative flex min-w-screen min-h-screen flex-col justify-center overflow-hidden bg-gray-50 p-12">
+            <h1 tw="text-6xl font-bold text-start mr-10">{headerText}</h1>
+            <p tw="text-4xl py-0 text-start">
+              Wow, you already have some active MeetFrames! 😏
             </p>
-            <p tw="text-xs text-center">
+            <p tw="text-4xl py-0 text-start">
               You can check the status of your existing frames or create a new
               one
             </p>
-            <p tw="text-xs text-center">Use the buttons below to proceed</p>
           </div>
         ),
         imageOptions: {
@@ -112,15 +112,17 @@ const prepareFrameBody = (
     default:
       return {
         image: (
-          <div tw="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12">
-            <h1 tw="text-xs font-bold text-center">{headerText}</h1>
-            <p tw="text-xs text-center">
+          <div tw="relative flex min-w-screen min-h-screen flex-col justify-center overflow-hidden bg-gray-50 p-12">
+            <h1 tw="text-6xl font-bold text-start mr-10">{headerText}</h1>
+            <p tw="text-4xl py-0 text-start">
               I see, you have no active MeetFrames yet!
             </p>
-            <p tw="text-xs text-center">
-              Making a MeetFrame is as easy as 1-2-3-4-mint steps
+            <p tw="text-4xl py-0 text-start">
+              Making a MeetFrame is as easy as 1-2-3-4 steps
             </p>
-            <p tw="text-xs text-center">Use the button below to get started</p>
+            <p tw="text-4xl py-0 text-start">
+              Use the button below to get started
+            </p>
           </div>
         ),
         imageOptions: {

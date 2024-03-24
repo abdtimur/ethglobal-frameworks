@@ -1,4 +1,4 @@
-export const MEETFRAMES_ADDRESS = "0x722F7a61d1a58d22bcEA95184a4FAadEe955F689";
+export const MEETFRAMES_ADDRESS = "0xd1e97BB35831c0F2ef4b9884500B554e76e5A1e4";
 export const MeetFramesAbi = [
   {
     inputs: [],
@@ -49,9 +49,9 @@ export const MeetFramesAbi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
+        internalType: "uint256",
+        name: "bidderFid",
+        type: "uint256",
       },
       {
         internalType: "string",
@@ -146,9 +146,9 @@ export const MeetFramesAbi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
+        internalType: "uint256",
+        name: "mentorFid",
+        type: "uint256",
       },
     ],
     name: "getActiveFrames",
@@ -165,9 +165,9 @@ export const MeetFramesAbi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "mentor",
-        type: "address",
+        internalType: "uint256",
+        name: "mentorFid",
+        type: "uint256",
       },
     ],
     name: "getActiveFramesCount",
@@ -202,9 +202,9 @@ export const MeetFramesAbi = [
         type: "string",
       },
       {
-        internalType: "address",
-        name: "bidder",
-        type: "address",
+        internalType: "uint256",
+        name: "bidderFid",
+        type: "uint256",
       },
     ],
     name: "getFrameBid",
@@ -215,6 +215,11 @@ export const MeetFramesAbi = [
             internalType: "address",
             name: "bidder",
             type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "bidderFid",
+            type: "uint256",
           },
           {
             internalType: "uint256",
@@ -312,9 +317,9 @@ export const MeetFramesAbi = [
             type: "uint256",
           },
           {
-            internalType: "address",
+            internalType: "uint256",
             name: "winner",
-            type: "address",
+            type: "uint256",
           },
           {
             internalType: "uint256",
@@ -348,9 +353,9 @@ export const MeetFramesAbi = [
         type: "string",
       },
       {
-        internalType: "address",
+        internalType: "uint256",
         name: "bidder",
-        type: "address",
+        type: "uint256",
       },
     ],
     name: "getFrameValueLocked",
@@ -375,9 +380,9 @@ export const MeetFramesAbi = [
     name: "getFrameWinner",
     outputs: [
       {
-        internalType: "address",
+        internalType: "uint256",
         name: "",
-        type: "address",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

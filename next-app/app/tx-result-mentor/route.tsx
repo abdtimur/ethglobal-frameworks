@@ -4,9 +4,6 @@ import { createFrames, Button } from "frames.js/next";
 const frames = createFrames();
 const handleRequest = frames(async (ctx) => {
   if (ctx.message?.transactionId) {
-    const stateString = (ctx.message?.state as string) || "{}";
-    const frameState = JSON.parse(stateString) as any;
-    const frameId = frameState?.frameId || null;
     return {
       image: (
         <div tw="relative flex min-w-screen min-h-screen flex-col justify-center overflow-hidden bg-gray-50 p-12">
@@ -22,19 +19,15 @@ const handleRequest = frames(async (ctx) => {
               {ctx.message.transactionId}
             </div>
             <span tw="text-2xl text-start">
-              Please wait for tx to confirm and return to the event details page
+              Please wait for tx to confirm and return to the home page to check
+              the available frames.
             </span>
           </div>
         </div>
       ),
       buttons: [
-        <Button
-          action="post"
-          target={{
-            pathname: `${frameId ? `/details/${frameId}` : "/frames"}`,
-          }}
-        >
-          Back to Details
+        <Button action="post" target={{ pathname: `/frames` }}>
+          Return to the home page
         </Button>,
         <Button
           action="link"
@@ -46,9 +39,9 @@ const handleRequest = frames(async (ctx) => {
     };
   } else {
     return {
-      image: <span>Missing transaction ID</span>,
+      image: <span>{`Missing transaction ID... :(`}</span>,
       buttons: [
-        <Button action="post" target={{ pathname: "/mentors" }}>
+        <Button action="post" target={{ pathname: "/frames" }}>
           Return to the main page
         </Button>,
       ],

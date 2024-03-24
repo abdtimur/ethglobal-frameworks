@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { getFrameMessage } from "frames.js";
 import { createFrames, Button } from "frames.js/next";
-import { parseEther } from "viem";
+import { formatEther, parseEther } from "viem";
 
 export interface NewFrameStateData {
   newFrameId: string;
@@ -275,30 +275,30 @@ const handle4stage = async (ctx) => {
   return {
     image: (
       <div tw="relative flex min-w-screen min-h-screen flex-col justify-center overflow-hidden bg-gray-50 p-12">
-        <h1 tw="text-6xl font-bold text-start mr-10">
-          Congratulations! Your frame is ready.
+        <h1 tw="text-5xl font-bold text-start mr-10">
+          {`Congratulations! Your frame is ready ☺️`}
         </h1>
-        <p tw="text-4xl py-0 text-start">
+        <span tw="text-3xl py-0 text-start mb-4">
           Know we will put it on-chain, so you can get paid to your wallet by
           the winner. Please verify all the details below:
-        </p>
-        <p tw="text-4xl py-0 text-start">
-          Event Name: {frameState.sessionTitle}
-        </p>
-        <p tw="text-4xl py-0 text-start">
-          Event Time: {new Date(frameState.targetTime).toUTCString()}
-        </p>
-        <p tw="text-4xl py-0 text-start">
-          Sales Deadline: {new Date(frameState.closingTime).toUTCString()}
-        </p>
-        <p tw="text-4xl py-0 text-start">Minimum Bid: {minBid} wei</p>
+        </span>
+        <div tw="flex flex-col justify-center text-3xl py-0 text-start">
+          <span>- Event Name: {frameState.sessionTitle}</span>
+          <span>
+            - Event Time: {new Date(frameState.targetTime).toUTCString()}
+          </span>
+          <span>
+            - Sales Deadline: {new Date(frameState.closingTime).toUTCString()}
+          </span>
+          <span>- Minimum Bid: {formatEther(BigInt(minBid))} ETH</span>
+        </div>
       </div>
     ),
     imageOptions: {
       aspectRatio: "1.91:1",
     },
     buttons: [
-      <Button action="tx" target="/txdata-mentor" post_url="/tx-result">
+      <Button action="tx" target="/txdata-mentor" post_url="/tx-result-mentor">
         All Good, Let's do it!
       </Button>,
       // TODO: Add back / cancel button

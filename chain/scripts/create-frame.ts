@@ -5,7 +5,7 @@ async function createFrame() {
 
   const meetContract = await ethers.getContractAt(
     "MeetFrames",
-    "0x722F7a61d1a58d22bcEA95184a4FAadEe955F689"
+    "0xd1e97BB35831c0F2ef4b9884500B554e76e5A1e4"
   );
 
   const frameInfo = {

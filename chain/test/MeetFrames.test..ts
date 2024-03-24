@@ -10,6 +10,10 @@ describe("Golden Path Tests", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, mentor, buyer, buyer2] = await ethers.getSigners();
 
+    const mentorFid = 1;
+    const buyerFid = 2;
+    const buyer2Fid = 3;
+
     const MeetFrames = await ethers.getContractFactory("MeetFrames");
     const meetFramesContract = await (
       await MeetFrames.connect(owner).deploy()
@@ -24,7 +28,7 @@ describe("Golden Path Tests", function () {
       mentorName: "lolchto",
       mentorProfile: "https://warpcast.com/lolchto",
       sessionTitle: "Offline coffee break with Tim",
-      fid: 1,
+      fid: mentorFid,
       closingTime: new Date().getTime() + 1000 * 60 * 1, // 1 minute from now
       targetTime: new Date().getTime() + 1000 * 60 * 2, // 2 minutes from now
       minBid: ethers.parseEther("0.001"),
@@ -45,13 +49,11 @@ describe("Golden Path Tests", function () {
       );
 
     const activeCount = await meetFramesContract.getActiveFramesCount(
-      mentor.address
+      mentorFid
     );
     console.log(activeCount);
 
-    const activeFrames = await meetFramesContract.getActiveFrames(
-      mentor.address
-    );
+    const activeFrames = await meetFramesContract.getActiveFrames(mentorFid);
     console.log(activeFrames.length);
 
     const frameId1 = activeFrames[0];
@@ -62,8 +64,11 @@ describe("Golden Path Tests", function () {
       testFrame1,
       owner,
       mentor,
+      mentorFid,
       buyer,
+      buyerFid,
       buyer2,
+      buyer2Fid,
       frameId1,
     };
   }
@@ -86,12 +91,12 @@ describe("Golden Path Tests", function () {
     });
 
     it("Should place a bid", async function () {
-      const { meetFramesContract, testFrame1, mentor, buyer } =
+      const { meetFramesContract, testFrame1, mentor, buyer, buyerFid } =
         await loadFixture(deployMeetFrames);
 
       await meetFramesContract
         .connect(buyer)
-        .bidFrame(mentor.address, testFrame1.frameId, {
+        .bidFrame(buyerFid, testFrame1.frameId, {
           value: ethers.parseEther("0.002"),
         });
       console.log(
@@ -106,27 +111,27 @@ describe("Golden Path Tests", function () {
       console.log(mentor.address + " " + testFrame1.frameId);
       const frameBid = await meetFramesContract.getFrameBid(
         testFrame1.frameId,
-        buyer.address
+        buyerFid
       );
       expect(frameBid.bidder).to.equal(buyer.address);
       expect(frameBid.bid).to.equal(ethers.parseEther("0.002"));
     });
 
     it("Should not place a bid below minimum", async function () {
-      const { meetFramesContract, testFrame1, mentor, buyer } =
+      const { meetFramesContract, testFrame1, mentor, buyer, buyerFid } =
         await loadFixture(deployMeetFrames);
 
       await expect(
         meetFramesContract
           .connect(buyer)
-          .bidFrame(mentor.address, testFrame1.frameId, {
+          .bidFrame(buyerFid, testFrame1.frameId, {
             value: ethers.parseEther("0.0005"),
           })
       ).to.be.revertedWith("MeetFrames: bid is lower than winner bid");
     });
 
     it("Should not place a bid after closing time", async function () {
-      const { meetFramesContract, testFrame1, mentor, buyer } =
+      const { meetFramesContract, testFrame1, mentor, buyer, buyerFid } =
         await loadFixture(deployMeetFrames);
 
       // advance time to cutoff
@@ -134,7 +139,7 @@ describe("Golden Path Tests", function () {
       await expect(
         meetFramesContract
           .connect(buyer)
-          .bidFrame(mentor.address, testFrame1.frameId, {
+          .bidFrame(buyerFid, testFrame1.frameId, {
             value: ethers.parseEther("0.002"),
           })
       ).to.be.revertedWith("MeetFrames: frame is closed");
@@ -142,7 +147,7 @@ describe("Golden Path Tests", function () {
 
     // it should complete the frame
     it("Should complete the frame with 0 reward", async function () {
-      const { meetFramesContract, testFrame1, mentor, buyer } =
+      const { meetFramesContract, testFrame1, mentor, buyer, buyerFid } =
         await loadFixture(deployMeetFrames);
 
       // advance time to target time
@@ -168,12 +173,12 @@ describe("Golden Path Tests", function () {
 
     // it should complete the frame with reward
     it("Should complete the frame with reward", async function () {
-      const { meetFramesContract, testFrame1, mentor, buyer } =
+      const { meetFramesContract, testFrame1, mentor, buyer, buyerFid } =
         await loadFixture(deployMeetFrames);
 
       await meetFramesContract
         .connect(buyer)
-        .bidFrame(mentor.address, testFrame1.frameId, {
+        .bidFrame(buyerFid, testFrame1.frameId, {
           value: ethers.parseEther("0.002"),
         });
 
@@ -202,12 +207,19 @@ describe("Golden Path Tests", function () {
 
     // it should return the bid to previous bidder
     it("Should return the bid to previous bidder", async function () {
-      const { meetFramesContract, testFrame1, mentor, buyer, buyer2 } =
-        await loadFixture(deployMeetFrames);
+      const {
+        meetFramesContract,
+        testFrame1,
+        mentor,
+        buyer,
+        buyer2,
+        buyerFid,
+        buyer2Fid,
+      } = await loadFixture(deployMeetFrames);
 
       await meetFramesContract
         .connect(buyer)
-        .bidFrame(mentor.address, testFrame1.frameId, {
+        .bidFrame(buyerFid, testFrame1.frameId, {
           value: ethers.parseEther("0.002"),
         });
 
@@ -216,7 +228,7 @@ describe("Golden Path Tests", function () {
       );
       await meetFramesContract
         .connect(buyer2)
-        .bidFrame(mentor.address, testFrame1.frameId, {
+        .bidFrame(buyer2Fid, testFrame1.frameId, {
           value: ethers.parseEther("0.003"),
         });
       const firstBuyerBalanceAfter = await ethers.provider.getBalance(
@@ -232,16 +244,18 @@ describe("Golden Path Tests", function () {
 
       const frameBid = await meetFramesContract.getFrameBid(
         testFrame1.frameId,
-        buyer2.address
+        buyer2Fid
       );
 
       expect(frameBid.bidder).to.equal(buyer2.address);
+      expect(frameBid.bidderFid).to.equal(buyer2Fid);
       expect(frameBid.bid).to.equal(ethers.parseEther("0.003"));
 
       const frameConfig = await meetFramesContract.getFrameConfig(
         testFrame1.frameId
       );
-      expect(frameConfig.winner).to.equal(buyer2.address);
+      expect(frameConfig.winner).to.equal(buyer2Fid);
+      expect(frameConfig.winnerBid).to.equal(ethers.parseEther("0.003"));
       expect(frameConfig.completed).to.equal(false);
     });
   });

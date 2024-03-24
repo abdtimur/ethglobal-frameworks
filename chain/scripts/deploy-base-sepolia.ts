@@ -3,7 +3,7 @@ import { ethers, run } from "hardhat";
 async function verify() {
   const contract = await ethers.getContractAt(
     "MeetFrames",
-    "0x722F7a61d1a58d22bcEA95184a4FAadEe955F689"
+    "0xd1e97BB35831c0F2ef4b9884500B554e76e5A1e4"
   );
 
   await run("verify:verify", {
@@ -28,7 +28,7 @@ async function main() {
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-verify().catch((error) => {
+main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
