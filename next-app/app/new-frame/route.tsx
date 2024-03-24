@@ -82,7 +82,7 @@ const handle0stage = async (ctx) => {
         </p>
       </div>
     ),
-    textInput: "Session Title",
+    textInput: "Session: MeetFrames Launch Party",
     imageOptions: {
       aspectRatio: "1.91:1",
     },
@@ -229,7 +229,7 @@ const handle3stage = async (ctx) => {
           4/4 What will be your minimum bid?
         </h1>
         <p tw="text-4xl py-0 text-start">
-          {`Please share the minimum bid amount below:`}
+          {`Please share the minimum bid ETH amount below:`}
         </p>
       </div>
     ),

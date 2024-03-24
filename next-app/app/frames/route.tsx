@@ -121,9 +121,6 @@ const prepareFrameBody = (
             <p tw="text-4xl py-0 text-start">
               Making a MeetFrame is as easy as 1-2-3-4 steps
             </p>
-            <p tw="text-4xl py-0 text-start">
-              Use the button below to get started
-            </p>
           </div>
         ),
         imageOptions: {

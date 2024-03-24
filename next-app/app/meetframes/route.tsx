@@ -20,9 +20,9 @@ const handleRequest = frames(async (ctx) => {
           This tool will help to sell your time and expertise in a new way.
         </p>
         <p tw="text-4xl py-0 text-start">
-          Create a frame and allow your follower to bid for your time.
+          Create a frame and allow your followers to bid for your time.
         </p>
-        <p tw="text-2xl text-center">Use the button below to get started.</p>
+        <p tw="text-2xl text-center">Use the button below to get started:</p>
       </div>
     ),
     imageOptions: {

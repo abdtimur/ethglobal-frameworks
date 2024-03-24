@@ -1,5 +1,5 @@
 // ./app/page.tsx
 
 export default function Page() {
-  return <span>Home page template</span>;
+  return <span>Welcome to MeetFrames!🥹</span>;
 }
