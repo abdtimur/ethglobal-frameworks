@@ -30,7 +30,7 @@ const handleRequest = frames(async (ctx) => {
     },
     buttons: [
       <Button action="post" target={{ pathname: "/frames" }}>
-        Let's go!
+        Let&apos;s go!
       </Button>,
     ],
     headers: {

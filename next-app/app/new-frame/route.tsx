@@ -31,6 +31,7 @@ const frames = createFrames({
   },
 });
 
+// @ts-ignore
 const handleRequest = frames(async (ctx) => {
   const stateString = (ctx.message?.state as string) || "{}";
   const stage = JSON.parse(stateString)?.stage || 0;
@@ -52,6 +53,7 @@ const handleRequest = frames(async (ctx) => {
   }
 });
 
+// @ts-ignore
 const handle0stage = async (ctx) => {
   const requesterFid = ctx?.message?.requesterFid || 0;
 
@@ -104,6 +106,7 @@ const handle0stage = async (ctx) => {
   };
 };
 
+// @ts-ignore
 const handle1stage = async (ctx) => {
   const stateString = (ctx.message?.state as string) || "{}";
   const frameState = JSON.parse(stateString) as any;
@@ -143,6 +146,7 @@ const handle1stage = async (ctx) => {
   };
 };
 
+// @ts-ignore
 const handle2stage = async (ctx) => {
   const stateString = (ctx.message?.state as string) || "{}";
   const frameState = JSON.parse(stateString) as any;
@@ -195,6 +199,7 @@ const handle2stage = async (ctx) => {
   };
 };
 
+// @ts-ignore
 const handle3stage = async (ctx) => {
   const stateString = (ctx.message?.state as string) || "{}";
   const frameState = JSON.parse(stateString) as any;
@@ -250,6 +255,7 @@ const handle3stage = async (ctx) => {
   };
 };
 
+// @ts-ignore
 const handle4stage = async (ctx) => {
   const stateString = (ctx.message?.state as string) || "{}";
   const frameState = JSON.parse(stateString) as any;
@@ -299,7 +305,7 @@ const handle4stage = async (ctx) => {
     },
     buttons: [
       <Button action="tx" target="/txdata-mentor" post_url="/tx-result-mentor">
-        All Good, Let's do it!
+        All Good, Let&apos;s do it!
       </Button>,
       // TODO: Add back / cancel button
     ],

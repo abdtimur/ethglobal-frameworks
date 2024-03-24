@@ -10,6 +10,7 @@ const frames = createFrames({
   },
 });
 
+// @ts-ignore
 const handleRequest = frames(async (ctx) => {
   try {
     const body = await ctx.request.json();
@@ -130,7 +131,7 @@ const prepareFrameBody = (
         },
         buttons: [
           <Button action="post" target={{ pathname: "/new-frame" }}>
-            Let's build your first MeetFrame
+            Let&apos;s build your first MeetFrame
           </Button>,
         ],
         headers,

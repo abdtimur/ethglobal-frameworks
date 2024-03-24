@@ -20,6 +20,8 @@ const loadChainData = async (frameId: string, requesterFid: number) => {
 };
 
 const frames = createFrames();
+
+// @ts-ignore
 const handleRequest = frames(async (ctx) => {
   console.log(ctx);
   const pathParams = ctx?.url?.pathname.split("/").filter(Boolean);
