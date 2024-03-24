@@ -33,3 +33,8 @@ export function getProperTimeLeftString(timeLeft: number) {
   }
   return "Time is up!";
 }
+
+export function getPinataDate(date: Date) {
+  // YYYY-MM-DD HH:MM:SS
+  return date.toISOString().replace(/T/, " ").replace(/\..+/, "");
+}

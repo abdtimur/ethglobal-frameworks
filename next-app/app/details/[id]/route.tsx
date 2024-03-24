@@ -64,14 +64,34 @@ const handleRequest = frames(async (ctx) => {
     </Button>
   );
 
-  // TODO: Test in the morning
-  // const getInteractions = await readPinataInteractions(
-  //   frameId,
-  //   `${frameId}/details`
-  // );
-  // const messageBody = await ctx.request.json();
-  // console.log(messageBody);
-  // sendPinataEvent(frameId, `${frameId}/details`, messageBody);
+  const getInteractions = await readPinataInteractions(
+    frameId,
+    `${frameId}-details`
+  );
+  let coeff = 0n;
+  if (getInteractions) {
+    // We will take only non-unique for now
+    console.log(`Total interactions: ${getInteractions.total_interactions}`);
+    switch (true) {
+      case getInteractions.total_interactions > 100:
+        coeff = 10n;
+        break;
+      case getInteractions.total_interactions > 50:
+        coeff = 5n;
+        break;
+      case getInteractions.total_interactions > 10:
+        coeff = 4n;
+        break;
+      default:
+        coeff = 2n;
+    }
+  }
+
+  let startBid = BigInt(config.minBid);
+  const startBidCoeff = startBid * coeff;
+
+  const messageBody = await ctx.request.json();
+  sendPinataEvent(frameId, `${frameId}-details`, messageBody);
 
   const winnerFcUser =
     config.winner > 0n ? await getFcUser(config.winner.toString()) : null;
@@ -80,7 +100,7 @@ const handleRequest = frames(async (ctx) => {
     return prepareMentorView(frameId, config, winnerFcUser);
   }
   return requesterCanBid
-    ? prepareBidderView(frameId, linkButton, config, timeLeft)
+    ? prepareBidderView(frameId, linkButton, config, timeLeft, startBidCoeff)
     : prepareJustView(frameId, isRequesterWinner, linkButton, config, timeLeft);
 });
 
@@ -181,7 +201,8 @@ const prepareBidderView = (
   frameId: string,
   linkButton: JSX.Element,
   config: FrameConfig,
-  timeLeft: string
+  timeLeft: string,
+  startBid: bigint
 ) => {
   return {
     image: (
@@ -195,7 +216,7 @@ const prepareBidderView = (
             Current event status: {config.completed ? "Completed" : "Active"}
           </div>
           <div tw="flex text-2xl text-start font-black mb-4">
-            Bids start from {formatEther(BigInt(config.minBid))} ETH
+            Bids start from {formatEther(startBid)} ETH
           </div>
           <div tw="flex text-2xl text-start font-black mb-4">
             You still have a chance to participate! Time left: {timeLeft}
