@@ -23,8 +23,29 @@ export const getFcUser = async (fid: string) => {
 export const sendPinataEvent = async (
   frameId: string,
   customId: string,
-  data: any
+  alldata: any
 ) => {
+  const data = {
+    trustedData: {
+      messageBytes: alldata?.trustedData?.messageBytes ?? undefined,
+    },
+    untrustedData: {
+      buttonIndex: alldata?.untrustedData?.buttonIndex ?? undefined,
+      castId: {
+        fid: alldata?.untrustedData?.castId?.fid ?? undefined,
+        hash: alldata?.untrustedData?.castId?.hash ?? undefined,
+      },
+      fid: alldata?.untrustedData?.fid ?? undefined,
+      inputText: alldata?.untrustedData?.inputText ?? undefined,
+      messageHash: alldata?.untrustedData?.messageHash ?? undefined,
+      network: alldata?.untrustedData?.network ?? undefined,
+      timestamp: alldata?.untrustedData?.timestamp ?? undefined,
+      url: alldata?.untrustedData?.url ?? undefined,
+    },
+  };
+
+  console.log("Sending pinata event: ", JSON.stringify(data));
+
   const response = await fetch(
     "https://api.pinata.cloud/farcaster/frames/interactions",
     {
@@ -36,10 +57,7 @@ export const sendPinataEvent = async (
       body: JSON.stringify({
         frame_id: frameId,
         custom_id: customId,
-        data: {
-          trustedData: data.trustedData,
-          untrustedData: data.untrustedData,
-        },
+        data: data,
       }),
     }
   );

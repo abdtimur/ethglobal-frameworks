@@ -5,7 +5,6 @@ import { formatEther, parseEther } from "viem";
 
 export interface NewFrameStateData {
   newFrameId: string;
-  mentor: string;
   mentorName: string;
   mentorProfile: string;
   sessionTitle: string;
@@ -19,7 +18,6 @@ const frames = createFrames({
   // basePath: "/new-frame",
   initialState: {
     newFrameId: "",
-    mentor: "",
     mentorName: "",
     mentorProfile: "",
     sessionTitle: "",
@@ -62,15 +60,13 @@ const handle0stage = async (ctx) => {
   const frameState = JSON.parse(frameMessage.state || "{}") as any;
   console.log("Frame message", frameMessage);
 
-  const mentorAddress =
-    frameMessage.connectedAddress || frameMessage.requesterVerifiedAddresses[0];
   const mentorProfile = `https://warpcast.com/${frameMessage.requesterUserData?.username}`;
   const mentorName = frameMessage.requesterUserData?.username;
-  console.log("Mentor", mentorName, mentorAddress, mentorProfile);
+  console.log("Mentor", mentorName, mentorProfile);
 
-  if (!requesterFid || !mentorName || !mentorAddress) {
+  if (!requesterFid || !mentorName) {
     throw new Error(
-      `Mentor name or address not found. ${mentorName} ${mentorAddress}`
+      `Mentor name or address not found. ${mentorName} ${requesterFid}`
     );
   }
 
@@ -97,7 +93,6 @@ const handle0stage = async (ctx) => {
     ],
     state: {
       ...frameState,
-      mentor: mentorAddress,
       mentorName,
       mentorProfile,
       fid: requesterFid,
